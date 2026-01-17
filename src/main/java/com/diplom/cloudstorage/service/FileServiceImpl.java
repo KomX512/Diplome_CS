@@ -1,0 +1,59 @@
+package com.diplom.cloudstorage.service;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import com.diplom.cloudstorage.entity.FileEntity;
+import com.diplom.cloudstorage.entity.User;
+import com.diplom.cloudstorage.exception.FileNotFoundException;
+import com.diplom.cloudstorage.repository.FileRepository;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class FileServiceImpl implements FileService {
+
+    private final FileRepository fileRepository;
+
+    @Override
+    @Transactional
+    public void uploadFile(User owner, String filename, byte[] content) {
+        FileEntity file = new FileEntity();
+        file.setOwner(owner);
+        file.setFilename(filename);
+        file.setContent(content);
+        fileRepository.save(file);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public byte[] downloadFile(User owner, String filename) {
+        FileEntity file = fileRepository.findByOwnerAndFilename(owner, filename)
+                .orElseThrow(() -> new FileNotFoundException("Файл не найден"));
+        return file.getContent();
+    }
+
+    @Override
+    @Transactional
+    public void deleteFile(User owner, String filename) {
+        FileEntity file = fileRepository.findByOwnerAndFilename(owner, filename)
+                .orElseThrow(() -> new FileNotFoundException("Файл не найден"));
+        fileRepository.delete(file);
+    }
+
+    @Override
+    @Transactional
+    public void renameFile(User owner, String oldName, String newName) {
+        FileEntity file = fileRepository.findByOwnerAndFilename(owner, oldName)
+                .orElseThrow(() -> new FileNotFoundException("Файл не найден"));
+        file.setFilename(newName);
+        fileRepository.save(file);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<FileEntity> listFiles(User owner) {
+        return fileRepository.findAllByOwner(owner);
+    }
+}

@@ -24,8 +24,18 @@ public class DataInitializer {
 
             createFile(user, "document.pdf", "Это пример PDF файла.".getBytes());
             createFile(user, "photo.png", generateSampleImageBytes());
-            createFile(user, "notes.txt", "Пример заметок для теста.".getBytes());
+            createFile(user, "text.txt", "Пример заметок для теста.".getBytes());
         }
+
+        if (!userRepository.existsByLogin("user1")) {
+            User user = new User("user1", PasswordUtil.hash("123123"));
+            userRepository.save(user);
+
+            createFile(user, "doc_by_user1.pdf", "Это пример PDF файла.".getBytes());
+            createFile(user, "photo_by_user1.png", generateSampleImageBytes());
+            createFile(user, "text_by_user1.txt", "Пример заметок для теста.".getBytes());
+        }
+
     }
 
     private void createFile(User user, String filename, byte[] content) {

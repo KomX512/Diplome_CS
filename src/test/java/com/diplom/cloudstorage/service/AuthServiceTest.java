@@ -62,7 +62,7 @@ class AuthServiceTest {
         fileRepository.deleteAll();
         userRepository.deleteAll();
 
-        testLogin = "auth-" + UUID.randomUUID() + "@example.com";
+        testLogin = "auth-" + UUID.randomUUID();
         User user = new User(testLogin, PasswordUtil.hash(TEST_PASSWORD));
         userRepository.save(user);
     }
